@@ -1,0 +1,235 @@
+<html ang="zh-CN"><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>接口运行</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <link rel="stylesheet" href="/lemon/css/index.css" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/lemon/css/pagination.css">
+    <link rel="stylesheet" type="text/css" href="/lemon/css/alert.css">
+</head>
+<body>
+        	<div class="right-interlist right-interpre">
+        		<div class="nav-interpre">
+	        		<ul>
+						<li><a href="apiView.html">预览</a></li>
+						<li><a href="apiEdit.html">编辑</a></li>
+						<li class="active"><a href="#">运行</a></li>
+					</ul>
+				</div>
+        		<form name="apiRunForm">
+        		<input name="id" :value="apiVO.id" type="hidden">
+        		<input name="method" :value="apiVO.method" type="hidden">
+        		<input name="host" :value="projectHost" type="hidden">
+        		<input name="projectId" :value="projectId" type="hidden">
+        		<div class="del-interrun">
+        			<div class="envirset-interrun">
+						<div class="line-interedit line-interrun line-com clearfix">
+							<select style="width:10%;" name="method" disabled="disabled">
+								<option value="get" :selected="apiVO.method=='get'">GET</option>
+								<option value="post" :selected="apiVO.method=='post'">POST</option>
+								<option value="put" :selected="apiVO.method=='put'">PUT</option>
+								<option value="delete" :selected="apiVO.method=='delete'">DELETE</option>
+								<option value="head" :selected="apiVO.method=='head'">HEAD</option>
+								<option value="option" :selected="apiVO.method=='option'">OPTION</option>
+								<option value="patch" :selected="apiVO.method=='patch'">PATCH</option>
+							</select>
+							<div class="ipt-interedit f-l" style="margin-left:5px;width:30%;">
+								<input class="iptenvir-interrun" :value="projectHost" disabled="disabled" type="text">
+							</div>
+							<div class="ipt-interedit" style="margin-left:5px;width:53%;">
+								<input readonly="readonly" class="disabled" name="url" :value="apiVO.url" placeholder="接口名称" type="text">
+							</div>
+						</div>
+						<div class="btnbox-interrun f-r">
+							<a href="javascript:void(0);" class="btn-send btn-com" style="margin-left:5px;">发送</a>
+							<a href="javascript:void(0);" id="btnSaveInter" class="btn-save btn-com">添加到测试集</a>
+						</div>
+        			</div>
+        			<div class="paramlist-interrun">
+						<div class="paramcom-interrun radius4">
+							<div class="paramtit-interrun"><i class="icon-arrow active"></i>QUERIES</div>
+							<div class="paramline-interrun active" id="reqpQuery">
+								<!-- <div class="line-com line-interrun">
+									<input name="queryParams[0].id" value="7" type="hidden">
+									<div class="ipt-interrun f-l" style="width:15%">
+										<div class="ltipt-interrun">
+											<input class=" disabled" readonly="readonly" value=regname name="queryParams[0].name" type="text">
+										</div>
+										<div class="equal-interrun f-r">=</div>
+										<input class="disabled f-r" disabled="" checked="" type="checkbox">
+									</div>
+									<div class="ipt-interrun f-l" style="width:85%">
+										<input placeholder="参数值" style="width:100%" name="queryParams[0].value" value="" type="text">
+										<div class="edit-interrun f-l"></div>
+									</div>
+								</div> -->
+							</div>
+						</div>
+						<div class="paramcom-interrun radius4">
+							<div class="paramtit-interrun"><i class="icon-arrow active"></i>BODY</div>
+							<div class="paramline-interrun active" id="reqpBody">
+								<!-- <div class="line-com line-interrun">
+									<input name="bodyParams[0].id" value="7" type="hidden">
+									<div class="ipt-interrun f-l" style="width:15%">
+										<div class="ltipt-interrun">
+											<input class=" disabled" readonly="readonly" value="mobilephone" name="bodyParams[0].name" type="text">
+										</div>
+										<div class="equal-interrun f-r">=</div>
+										<input class="disabled f-r" disabled="" checked="" type="checkbox">
+									</div>
+									<div class="ipt-interrun f-l" style="width:85%">
+										<input placeholder="参数值" style="width:100%" name="bodyParams[0].value" value="" type="text">
+										<div class="edit-interrun f-l"></div>
+									</div>
+								</div>
+								<div class="line-com line-interrun">
+									<input name="bodyParams[1].id" value="8" type="hidden">
+									<div class="ipt-interrun f-l" style="width:15%">
+										<div class="ltipt-interrun">
+											<input class=" disabled" readonly="readonly" value="pwd" name="bodyParams[1].name" type="text">
+										</div>
+										<div class="equal-interrun f-r">=</div>
+										<input class="disabled f-r" disabled="" checked="" type="checkbox">
+									</div>
+									<div class="ipt-interrun f-l" style="width:85%">
+										<input placeholder="参数值" style="width:100%" name="bodyParams[1].value" value="" type="text">
+										<div class="edit-interrun f-l"></div>
+									</div>
+								</div> -->
+							</div>
+						</div>
+						<div class="paramcom-interrun radius4">
+							<div class="paramtit-interrun"><i class="icon-arrow active"></i>HEADERS</div>
+							<div class="paramline-interrun active" id="reqpHeaders">
+								<!-- <div class="line-com line-interrun">
+									<input name="headerParams[0].id" value="9" type="hidden">
+									<div class="ipt-interrun f-l" style="width:15%">
+										<div class="ltipt-interrun">
+											<input class=" disabled" readonly="readonly" value="Content-Type" name="headerParams[0].name" type="text">
+										</div>
+										<div class="equal-interrun f-r">=</div>
+										<input class="disabled f-r" disabled="" checked="" type="checkbox">
+									</div>
+									<div class="ipt-interrun f-l" style="width:85%">
+										<input placeholder="参数值" style="width:100%" name="headerParams[0].value" value="" type="text">
+										<div class="edit-interrun f-l"></div>
+									</div>
+								</div> -->
+							</div>
+						</div>
+        			</div>
+        			<div class="response-interrun">
+        				<div class="restit-interrun">
+							<div class="titnav-interrun">Response</div>
+        				</div>
+						<div class="reslist-interrun">
+							<div class="comlist-interrun headlist-interrun f-l" style="width: 40%;"> 
+								<div class="titlist-interrun">Headers</div>
+								<div class="txtlist-interrun radius4" name="responseHeader">
+									<pre></pre>
+								</div>
+							</div>
+							<div class="comlist-interrun bodylist-interrun f-l" style="width: 60%;">
+								<div class="titlist-interrun">Body</div>
+								<div class="txtlist-interrun radius4" name="responseData">
+									<pre></pre>
+								</div>
+							</div>
+						</div>
+        			</div>
+        		</div>
+        	</form>
+        	</div>
+        
+        <!-- 添加到集合 -->
+        <div class="addass-layer top-border btm-border" id="addAssemble">
+        	<form name="addSuiteForm">
+			<div class="top-addass">
+				<div class="line-com">
+					<label>接口用例名：</label>
+					<input placeholder="请输入接口用例名称" name="name" class="required" data-valid="isNonEmpty" data-error="内容不能为空" type="text">
+				</div>
+			</div>
+			<div class="sellist-addass">
+				<div class="seltit-addass">请选择添加到的集合：</div>
+				<ul>
+				</ul>
+			</div>
+			<div class="new-addass radius4">
+				<div class="newline-addass comsib-comdul">
+				</div>
+			</div>
+			</form>
+     <script type="text/javascript" src="/lemon/js/jquery-1.11.3.js"></script>  
+     <script type="text/javascript" src="/lemon/js/jquery.pagination.js"></script>
+     <script type="text/javascript" src="/lemon/js/alert.js"></script>
+     <script type="text/javascript" src="/lemon/js/base.js"></script>
+     <script type="text/javascript" src="/lemon/js/common.js"></script>
+     <script type="text/javascript" src="/lemon/js/jquery-validate.js"></script>
+
+	 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	 <script type="text/javascript" src="/lemon/js/jquery.cookie.js"></script>
+	 <script>
+		var myvue = new Vue({
+			el: ".right-interpre", //挂载点
+			data: {
+			   apiVO:{},
+			   projectHost:"",
+			   projectId:""
+			},
+			methods: {
+				showApiVO(){
+					let apiId = sessionStorage.getItem("apiId");
+					let url = lemon.config.global.apiUrl + "/api/toApiView";
+				axios.get(url,{
+					headers:{"Authorization": $.cookie("sessionId")},
+					params:{"apiId":apiId},
+				})
+				.then(res => {
+					if(res.status=="1" && res.message=="账号未登录!"){
+							location.href = lemon.config.global.rootUrl
+									+ "/html/login.html";
+						}
+					this.apiVO = res.data.data; 
+					let requestParams = this.apiVO.requestParams;
+						for(let i=0; i<requestParams.length; i++){
+							let param = requestParams[i];
+							let appendStr = `<div class="line-com line-interrun">
+									<input name="requestParams[${i}].id" value="${param.id}" type="hidden">
+									<input name="requestParams[${i}].type" value="${param.type}" type="hidden">
+									<div class="ipt-interrun f-l" style="width:15%">
+										<div class="ltipt-interrun">
+											<input class=" disabled" readonly="readonly" value="${param.name==''||param.name==null?'json':param.name}" name="requestParams[${i}].name" type="text">
+										</div>
+										<div class="equal-interrun f-r">=</div>
+										<input class="disabled f-r" disabled="" checked="" type="checkbox">
+									</div>
+									<div class="ipt-interrun f-l" style="width:85%">
+										<input placeholder="参数值" style="width:100%" name="requestParams[${i}].value" value="${param.exampleData}" type="text">
+										<div class="edit-interrun f-l"></div>
+									</div>
+								</div>`;
+							if(param.type==1){
+								$("#reqpQuery").append(appendStr);
+							}else if(param.type==2 || param.type==4){ 
+								$("#reqpBody").append(appendStr);
+							}else if(param.type==3){
+								$("#reqpHeaders").append(appendStr);
+							}				
+						}
+				})
+				}
+			},
+			created(){
+				this.projectHost = sessionStorage.getItem("projectHost");
+				this.projectId = sessionStorage.getItem("projectId");
+				this.showApiVO();
+				
+			}
+		})
+	</script>
+	<script type="text/javascript" src="/lemon/js/apiRun.js"></script>
+
+</div></body></html>

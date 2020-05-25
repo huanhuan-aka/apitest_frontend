@@ -1,0 +1,129 @@
+<html ang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>测试集合</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<meta http-equiv="Cache-Control" content="no-transform">
+<link rel="stylesheet" href="/lemon/css/index.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="/lemon/css/pagination.css">
+<link rel="stylesheet" type="text/css" href="/lemon/css/alert.css">
+</head>
+<body>
+	<input name="idOfSelectedSuite" value="2" type="hidden">
+	<div class="right-interlist right-testass">
+		<div class="desc-interlist">
+			<div class="desctop-interlist">
+				<div class="desctit-interlist f-l">测试集合</div>
+				<a href="javascript:;" id="starttest" class="btn-addfl btn-com f-r">开始测试</a>
+			</div>
+			<div class="remark-interlist">
+				<input class="input-com" value="此处是套件的描述信息description" type="text">
+				<div class="btnbox-interlist">
+					<a href="javascript:;" class="btn-edit"></a> <a href="javascript:;"
+						class="btn-sure"></a> <a href="javascript:;" class="btn-cancel"></a>
+				</div>
+			</div>
+		</div>
+		<div class="data-intrelist data-testass">
+			<table>
+				<thead>
+					<tr>
+						<th width="20%">用例名称</th>
+						<th width="8%">状态</th>
+						<th width="47%">接口路径</th>
+						<th width="15%">测试报告</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="caseVO in caseList">
+						<input name="id" :value="caseVO.id" type="hidden">
+						<td><a href="caseEdit.html" name="caseEditHref" @click="saveCaseId(caseVO.id)">{{caseVO.name}}</a></td>
+						<td><i v-if="caseVO.testReport" :class="caseVO.testReport.passFlag=='通过'?'icon-success':'icon-fail'"></i></td>
+						<td><a href="apiView.html"
+							class="link-path" @click="saveApiId(caseVO.apiId)">{{caseVO.apiUrl}}</a></td>
+						<td><a href="#" class="btn-testrep btn-com btn-default">测试报告</a></td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+		<div class="box-pagination">
+			<div class="inline-block">
+				<div class="pagination m-style" id="pagination"></div>
+				<a href="test_report.html" id="reportView" class="btn-addfl btn-com f-r">查看报告</a>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/lemon/js/jquery-1.11.3.js"></script>
+	<script type="text/javascript" src="/lemon/js/jquery.pagination.js"></script>
+	<script type="text/javascript" src="/lemon/js/alert.js"></script>
+	<script type="text/javascript" src="/lemon/js/common.js"></script>
+	<script type="text/javascript" src="/lemon/js/caseList.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script type="text/javascript" src="/lemon/js/jquery.cookie.js"></script>
+	<script>
+		function logout(){
+		$.ajax({
+			//异步请求退出接口
+			//将sessionid取出来放到headers中,其中Authorization是后端CustomSessionManager定义的,前端要和后端保持一致
+			headers:{"Authorization": $.cookie("sessionId")},
+			url: lemon.config.global.apiUrl + "/user/logout",
+			type: "get",
+			success: function(ret){ //退出成功后,回到登录页面
+				if(ret.status=="1" && ret.message=="账号未登录!"){
+					location.href = lemon.config.global.rootUrl
+									+ "/html/login.html";
+				}
+			}
+		});
+	}
+	</script>
+	<script>
+		var myvue = new Vue({
+			el: ".right-interlist", //挂载点
+			data: {
+				caseList:[],
+			},
+			methods: {
+				saveApiId(apiId){
+                	sessionStorage.setItem("apiId",apiId);
+				},
+				saveCaseId(caseId){
+                	sessionStorage.setItem("caseId",caseId);
+				},
+			},
+			created(){
+				let projectId = sessionStorage.getItem("projectId");
+				let suiteId = sessionStorage.getItem("suiteId");
+				let listUrl = "";
+				if(projectId!=""){
+					listUrl = lemon.config.global.apiUrl + "/cases/showCaseUnderProject?projectId="+projectId;
+				}
+				if(suiteId!='' && suiteId!=null){
+					listUrl = lemon.config.global.apiUrl + "/cases/showCaseUnderSuite?suiteId="+suiteId;
+				}
+				axios.get(listUrl,{
+					headers:{
+						"Authorization": $.cookie("sessionId")
+					}
+				})
+				.then(res => {
+					 let resposeData = res.data;
+					if(resposeData.status==0 && resposeData.data!=null){
+						this.caseList = resposeData.data; //接收后端返回的用例集合
+					}else{
+						location.href = lemon.config.global.rootUrl
+										+ "/html/login.html";
+					}
+				})
+				.catch(err => {
+					console.error(err); 
+				})
+			}
+		})
+	</script>
+	<script type="text/javascript" src="/lemon/js/base.js"></script>
+</body>
+</html>

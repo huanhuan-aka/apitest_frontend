@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html class="indexHtml" ang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>后台管理</title>
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <link rel="stylesheet" type="text/css" href="/lemon/css/index.css">
+    <link rel="stylesheet" type="text/css" href="/lemon/css/pagination.css">
+    <link rel="stylesheet" type="text/css" href="/lemon/css/alert.css">
+</head>
+<body class="indexBody">
+	<input type="hidden" name="projectId" value="4"/>
+<div class="con-wripper">
+ <div class="con-top clearfix">
+        <div class="left-top f-l">
+            <div class="logo-top f-l">
+            </div>
+            <div class="modname-top f-l">API RUNNER</div>
+        </div>
+        <div class="right-top f-r">
+            <div class="srch-top f-l">
+                <input type="text"  class="ipt-top" placeholder="搜索分组/项目/接口" />
+            </div>
+            <div class="handle-top f-l">
+                <i class="icon-top icon-collect"></i>
+                <i class="icon-top icon-plus"></i>
+                <i class="icon-top icon-doubt"></i>
+            </div>
+           <div class="ctr-top f-l">
+                <div class="btn_stretch">
+                    <a class="header-top"></a>
+                    <i class="icon-arrow"></i>
+                </div>
+                <ul class="ctrlist-top">
+                    <li class="pctr-top">
+                        <a href="#">个人中心</a>
+                    </li>
+                    <li class="quit-top">
+                        <a href="/lemon/user/logout">退出</a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>    
+    <div class="nav-interlist">
+        <ul class="clearfix">
+            <li class="active"><a href="#">接口</a></li>
+            <li><a href="#">设置</a></li>
+        </ul>
+    </div>
+    <div class="main-interlist com-module clearfix">
+    <div class="left-interlist f-l active">
+            <div class="tab-interlist">
+                <div class="tabtype-interlist">
+                    <ul class="clearfix">
+                       <li ><a href="index.html">接口列表</a></li>
+                       <li class="active"><a href="index2.html" @click="removeSuiteId()">测试集合</a></li>
+                    </ul>
+                </div>
+                <div class="srchbox-interlist clearfix">
+                    <input type="text" placeholder="搜索用例" class="input-com f-l">
+                    <a href="javascript:;" class="btn-addfl btn-com f-r" id="addjh">添加集合</a>
+                </div>
+            </div>
+            <div class="list-interlist" id="listInter">
+                <ul class="type_menu">
+                    <li v-for="suite in suiteList">
+                        <div class="menu-interlist">
+                            <a href="/lemon/html/caseList.html" target="rightIframe" @click="saveSuiteId(suite.id)">
+                                <i class="icon-file"></i>
+                                <span>{{suite.name}}</span>
+                                <div class="hanmenu-interlist active">
+                                    <i class="icon-add"></i>
+                                    <i class="icon-edit"></i>
+                                    <i class="icon-delete"></i>
+                                </div>
+                            </a>
+                        </div>
+                        <!-- 默认展开第一个套件 -->
+                        	<ul class="tmenu-interlist active">
+                        		<!-- 加载此套件下的所有测试用例 -->
+	                            <li class="" v-for="caseVO in suite.casesList">
+	                                <a href="/lemon/html/caseEdit.html" target="rightIframe" @click="saveCaseId(caseVO.id)">
+	                                    	{{caseVO.name}}
+	                                    <div class="hantmenu-interlist active">
+	                                        <i class="icon-copy"></i>
+	                                        <i class="icon-delete"></i>
+	                                    </div>
+	                                </a>
+	                             </li>
+	                        </ul>
+	                  </li>
+                </ul>
+            </div>
+        </div>
+        <iframe class="rightIframe f-l" name="rightIframe" src="/lemon/html/caseList.html" onload="loadFrame(this);" scrolling="yes" frameborder="0"></iframe>
+    </div>
+    <!-- 测试集合弹窗 -->
+    <form id="addSuite">
+        <div class="dialog-addinter">
+            <div class="line-addinter form_control clearfix" >
+                <label><span>*</span>集合名称：</label>
+                <input type="text" placeholder="分类名称" class="required" data-valid="isNonEmpty" data-error="内容不能为空" name="name">
+                <span class="valid_message"></span>
+            </div>
+            <div class="line-addinter form_control clearfix describe">
+                <label>描述：</label>
+                <textarea type="text" class="path-addinter" placeholder="描述" name="description"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript" src="/lemon/js/jquery-1.11.3.js"></script>
+<script type="text/javascript" src="/lemon/js/jquery.pagination.js"></script>
+<script type="text/javascript" src="/lemon/js/alert.js"></script>
+<script type="text/javascript" src="/lemon/js/jquery-validate.js"></script>
+<script type="text/javascript" src="/lemon/js/common.js"></script>
+<script type="text/javascript" src="/lemon/js/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script type="text/javascript" src="/lemon/js/jquery.cookie.js"></script>
+<script>
+    function logout(){
+	$.ajax({
+		//异步请求退出接口
+		//将sessionid取出来放到headers中,其中Authorization是后端CustomSessionManager定义的,前端要和后端保持一致
+		headers:{"Authorization": $.cookie("sessionId")},
+		url: lemon.config.global.apiUrl + "/user/logout",
+		type: "get",
+		success: function(ret){ //退出成功后,回到登录页面
+			if(ret.status=="1" && ret.message=="账号未登录!"){
+				location.href = lemon.config.global.rootUrl
+								+ "/html/login.html";
+			}
+		}
+	});
+}
+</script>
+<script>
+    var myvue = new Vue({
+        el: ".left-interlist", //挂载点
+        data: {
+           suiteList:[],
+        },
+        methods: {
+            removeSuiteId(){
+                sessionStorage.removeItem("suiteId");
+            },
+            saveSuiteId(suiteId){
+                sessionStorage.setItem("suiteId",suiteId);
+            },
+            saveCaseId(caseId){
+                sessionStorage.setItem("caseId",caseId);
+            }
+        },
+        created(){
+            let projectId = sessionStorage.getItem("projectId");
+            let url = lemon.config.global.apiUrl + "/apiClassification/toIndex";
+            axios.get(url,{
+                headers:{"Authorization": $.cookie("sessionId")},
+                params:{"projectId":projectId,"tabId":2}
+            })
+            .then(res => {
+                let resposeData = res.data; //接收后端返回的结果
+                if(resposeData.status==0 && resposeData.data!=null){
+                    this.suiteList = resposeData.data;
+                }else{
+                    location.href = lemon.config.global.rootUrl
+									+ "/html/login.html";
+                }
+            })
+            .catch(err => {
+                console.error(err); 
+            })
+        }
+    })
+</script>
+<script type="text/javascript" src="/lemon/js/base.js"></script>
+</body>
+</html>

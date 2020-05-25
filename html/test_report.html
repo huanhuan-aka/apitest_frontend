@@ -1,0 +1,160 @@
+   <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>套件测试报告</title>
+            <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+            <style type="text/css" media="screen">
+        body  { font-family: Microsoft YaHei,Tahoma,arial,helvetica,sans-serif;padding: 20px;}
+        .success{
+                color: green;
+            }
+            .failure{
+                color: red;
+            }
+            
+        </style>
+        </head>
+        <body>
+            <div id="myDiv">
+            <h3 style="font-family: Microsoft YaHei">{{this.reportVO.suiteName}}套件测试报告</h3>
+            <p class='attribute'><strong>测试用例 : </strong>{{this.reportVO.totalCaseNum}}</p>
+            <p class='attribute'><strong>执行通过 : </strong>{{this.reportVO.successNum}}</p>
+            <p class='attribute'><strong>执行失败 : </strong>{{this.reportVO.failureNum}}</p>
+            <p class='attribute'><strong>通过率 : </strong>{{Number(this.reportVO.successNum/this.reportVO.totalCaseNum*100).toFixed(2)}}%</p>
+            <p class='attribute'><strong>测试人 : </strong>{{this.reportVO.testerName}}</p>
+            <p class='attribute'><strong>测试时间 : </strong>{{this.reportVO.createReportTime}}</p>
+            <div id="main" style="width: 600px;height: 400px;"></div>
+
+            <table id='result_table' class="table table-condensed table-bordered table-hover">
+                <colgroup>
+                    <col align='left' />
+                    <col align='right' />
+                    <col align='right' />
+                    <col align='right' />
+                </colgroup>
+                <tr id='header_row' class="text-center" style="font-weight: bold;font-size: 14px;">
+                    <th>用例编号</th>
+                    <th>用例名称</th>
+                    <th>接口地址</th>
+                    <th>返回结果</th>
+                    <th>执行结果</th>
+                </tr>
+                <tr :class="caseVO.testReport.passFlag=='通过'?'success':'failure'" v-for="caseVO in this.reportVO.caseList">
+                    <td>{{caseVO.id}}</td>
+                    <td>{{caseVO.name}}</td>
+                    <td>{{caseVO.apiUrl}}</td>
+                     <td>{{caseVO.testReport.responseBody}}</td>
+                    <td>{{caseVO.testReport.passFlag}}</td>
+                </tr>
+                <!-- <tr class='failClass warning'>
+                    <td>1</td>
+                    <td>WIFI 私有接口正常请求</td>
+                    <td>{&#039;code&#039;: 200, &#039;retCode&#039;: 0}</td>
+                     <td>fall</td>
+                    <td>pass</td>
+                </tr>
+                <tr class='failClass warning'>
+                    <td>2</td>
+                    <td>请求</td>
+                    <td>{&#039;统一权限管理系统&#039;: &#039;pass&#039;, &#039;优先使用最新版ie和chrome浏览器&#039;: &#039;pass&#039;, &#039;code&#039;: 200}</td>
+                     <td>fall</td>
+                    <td>pass</td>
+                </tr> -->
+            </table>
+        </div>
+        </body>
+        </html>
+        <script type="text/javascript" src="/lemon/js/jquery-1.11.3.js"></script>
+        <script type="text/javascript" src="/lemon/js/common.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script type="text/javascript" src="/lemon/js/jquery.cookie.js"></script>
+        <script src="/lemon/js/echarts.js"></script>
+
+        <script>
+            function logout(){
+            $.ajax({
+                //异步请求退出接口
+                //将sessionid取出来放到headers中,其中Authorization是后端CustomSessionManager定义的,前端要和后端保持一致
+                headers:{"Authorization": $.cookie("sessionId")},
+                url: lemon.config.global.apiUrl + "/user/logout",
+                type: "get",
+                success: function(ret){ //退出成功后,回到登录页面
+                    if(ret.status=="1" && ret.message=="账号未登录!"){
+                        location.href = lemon.config.global.rootUrl
+                                        + "/html/login.html";
+                    }
+                }
+            });
+        }
+        </script>
+        <script>
+            var myvue = new Vue({
+                el: "#myDiv", //挂载点
+                data: {
+                    reportVO:{},
+                },
+                methods: {
+                    
+                },
+                created(){
+                    let suiteId = sessionStorage.getItem("suiteId");
+                    let listUrl = "";
+                    if(suiteId!='' && suiteId!=null){
+                        listUrl = lemon.config.global.apiUrl + "/testReport/getReport";
+                    }
+                    axios.get(listUrl,{
+                        headers:{
+                            "Authorization": $.cookie("sessionId")
+                        },
+                        params:{"suiteId":suiteId},
+                    })
+                    .then(res => {
+                        let resposeData = res.data;
+                        if(res.status=="1" && res.message=="账号未登录!"){
+						location.top.href = lemon.config.global.rootUrl
+								+ "/html/login.html";
+                        }
+                        this.reportVO = resposeData.data;
+                        var myChart = echarts.init(document.getElementById('main'));
+
+                        var data = [{
+                            name: '通过数',
+                            value: this.reportVO.successNum
+                        }, {
+                            name: '失败数',
+                            value: this.reportVO.failureNum
+                        }];
+
+                        option = {
+                            title: [{
+                                text: '测试结果饼状图'
+                            }],
+                            color:['green','red'],
+                            series: [{
+                                type: 'pie',
+                                radius: '25%',
+                                center: ['50%', '50%'],
+                                data: data,
+                                animation: false,
+                                label: {
+                                    position: 'outer',
+                                    alignTo: 'none',
+                                    bleedMargin: 5
+                                },
+                                left: 0,
+                                right: '66.6667%',
+                                top: 0,
+                                bottom: 0
+                            }]
+                        };
+                        myChart.setOption(option);
+
+                    })
+                    .catch(err => {
+                        console.error(err); 
+                    })
+                }
+            })
+        </script>

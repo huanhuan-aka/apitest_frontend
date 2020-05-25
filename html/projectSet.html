@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html class="indexHtml" ang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>后台管理</title>
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <link rel="stylesheet" type="text/css"  href="/lemon/css/index.css">
+    <link rel="stylesheet" type="text/css" href="/lemon/css/pagination.css">
+    <link rel="stylesheet" type="text/css" href="/lemon/css/alert.css">
+</head>
+<body class="indexBody">
+<div class="con-wripper">
+    <div class="con-top clearfix">
+        <div class="left-top f-l">
+            <div class="logo-top f-l">
+            </div>
+            <div class="modname-top f-l">API RUNNER</div>
+        </div>
+        <div class="right-top f-r">
+            <div class="srch-top f-l">
+                <input type="text"  class="ipt-top" placeholder="搜索分组/项目/接口" />
+            </div>
+            <div class="handle-top f-l">
+                <i class="icon-top icon-collect"></i>
+                <i class="icon-top icon-plus"></i>
+                <i class="icon-top icon-doubt"></i>
+            </div>
+            <div class="ctr-top f-l">
+                <div class="btn_stretch">
+                    <a class="header-top"></a>
+                    <i class="icon-arrow"></i>
+                </div>
+                <ul class="ctrlist-top">
+                    <li class="pctr-top">
+                        <a href="#">个人中心</a>
+                    </li>
+                    <li class="quit-top">
+                        <a href="#">退出</a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+    <div class="nav-interlist">
+        <ul class="clearfix">
+            <li><a href="index.html">接口</a></li>
+            <li class="active"><a href="projectSet.html">项目设置</a></li>
+        </ul>
+    </div>
+    <div class="main-interlist com-module clearfix mr24">
+        <div class="item_tab">
+            <a class="tab_span" href="javascript:;">项目配置</a>
+        </div>
+        <div class="right-interlist item_main">
+            <div class="desc-interlist">
+                <div class="item_body btm-border">
+                    <a class="item_single2">
+                        <span class="item_ic"></span>
+                    </a>
+                    <span class="item2_title">个人中心</span>
+                </div>
+            </div>
+            <div class="form_box">
+                <form id="myForm">
+                <div class="line-addinter form_control clearfix" >
+                    <label><span>*</span>项目名称：</label>
+                    <input type="text" placeholder="项目名称" class="required" data-valid="isNonEmpty" data-error="内容不能为空" name="name" :value="project.name">
+                    <span class="valid_message"></span>
+                </div>
+                <div class="line-addinter form_control clearfix" >
+                    <label>接口基本路径<i class="icon-doubt"></i>：</label>
+                    <input type="text" placeholder="..." class="required" data-valid="isNonEmpty" name="host" :value="project.host" data-error="内容不能为空" >
+                    <span class="valid_message"></span>
+                </div>
+                <div class="line-addinter form_control clearfix describe">
+                    <label>描述：</label>
+                    <textarea type="text" class="path-addinter required" placeholder="描述" name="description" class="required" data-valid="isNonEmpty" data-error="内容不能为空">{{project.description}}</textarea>
+                    <span class="valid_message"></span>
+                </div>
+            </div>
+            <div class="btn_save"><a href="javascript:;">保 存</a></div>
+        </form>
+            <div class="del_box">
+                <div class="del_font">
+                    <h4>删除项目</h4>
+                    <p>项目一旦删除，将无法恢复数据，请谨慎操作！<br> 只有组长和管理员有权限删除项目。</p>
+                </div>
+                <a class="del_btn" href="javascript:;">删 除</a>
+            </div>
+        </div>
+    </div>
+    <div id="whether_del">
+        <div class="dialog-addinter">
+            项目一旦删除，将无法恢复数据，请谨慎操作！<br> 只有组长和管理员有权限删除项目。
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/lemon/js/jquery-1.11.3.js"></script>
+<script type="text/javascript" src="/lemon/js/jquery.pagination.js"></script>
+<script type="text/javascript" src="/lemon/js/alert.js"></script>
+<script type="text/javascript" src="/lemon/js/base.js"></script>
+<script type="text/javascript" src="/lemon/js/jquery-validate.js"></script>
+<script type="text/javascript" src="/lemon/js/interRun.js"></script>
+<script type="text/javascript" src="/lemon/js/interfaceList.js"></script>
+<script type="text/javascript" src="/lemon/js/common.js"></script>
+<script>
+    $(function(){
+        //高度计算
+        function calcHeight() {
+            var thispage = document.body.clientHeight
+            var itemmain = thispage - 246;
+            $(".item_main").height(itemmain);
+        }
+        calcHeight();
+        window.onresize=function(){
+            calcHeight();
+        }
+
+        $('.btn_save').click(function(){
+            let projectId = sessionStorage.getItem("projectId");
+            //异步请求,更新项目设置
+            $.ajax({
+                headers:{"Authorization":$.cookie("sessionId")},
+                url:lemon.config.global.apiUrl + "/project/" + projectId,
+                data:$("#myForm").serialize(), 
+                type:'put',
+                dataType:'json',
+                async:false,
+                success:function(ret){
+                    // alert(ret.message);
+                    dialog.close();
+                }
+            });
+        })
+
+
+        //删除项目
+        $('.del_btn').click(function(){
+            var dialog = jqueryAlert({
+                'style'   : 'pc',
+                'title'   : '删除项目',
+                'content' :  $('#whether_del'),
+                'modal'   : true,
+                'contentTextAlign' : 'left',
+                'width'   : '620px',
+                'animateType' : 'linear',
+                'buttons' :{
+                    '取消' : function(){
+                        dialog.close();
+                    },
+                    '确定':function(){
+                        var ifViladate = true;
+                        var $form = $('.pcAlert').last().find('#addForm2');
+                        ifViladate = $form.validate('submitValidate');
+                        if(!ifViladate)return;
+                        let projectId = sessionStorage.getItem("projectId");
+                        $.ajax({
+                            headers:{"Authorization":$.cookie("sessionId")},
+                            url:lemon.config.global.apiUrl + "/project/" + projectId,
+                            type:'delete',
+                            dataType:'json',
+                            async:false,
+                            success:function(ret){
+                                // alert(ret.message);
+                                dialog.close();
+                                location.href = lemon.config.global.rootUrl
+									+ "/html/projectList.html";
+                            }
+                        });
+
+                    }
+                }
+            })
+        });
+    })
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script type="text/javascript" src="/lemon/js/jquery.cookie.js"></script>
+<script>
+    var myvue = new Vue({
+        el: ".form_box", //挂载点
+        data: {
+           project:null
+        },
+        methods: {
+        },
+        created(){
+            let projectId = sessionStorage.getItem("projectId");
+            let url = lemon.config.global.apiUrl + "/project/" + projectId;
+            axios.get(url,{
+                headers:{"Authorization": $.cookie("sessionId")},
+            })
+            .then(res => {
+                let resposeData = res.data; //接收后端返回的结果
+                if(resposeData.status==0 && resposeData.data!=null){
+                    //说明有项目存在
+                    this.project = resposeData.data;
+                }else{
+                    location.href = lemon.config.global.rootUrl
+									+ "/html/login.html";
+                }
+            })
+            .catch(err => {
+                console.error(err); 
+            })
+        }
+    })
+</script>
+</body>
+</html>
